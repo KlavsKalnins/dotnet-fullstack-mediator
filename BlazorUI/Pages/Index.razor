@@ -1,0 +1,47 @@
+﻿@page "/"
+@inject MediatR.IMediator _mediator
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+
+<ul>
+    @foreach(var p in people)
+    {
+        <li>@p.Name</li>
+    }
+</ul>
+
+<h2>Todos</h2>
+<p>TODO: create Input</p>
+<ul>
+    @foreach(var todo in todos)
+    {
+        <div>
+            <h3>@todo.Title</h3>
+            <p>@todo.TimeCreated</p>
+            <button @onclick="() => CompleteTodo(todo)">@(todo.TimeCompleted == null ? "Complete" : "UnComplete")</button>
+        </div>
+    }
+</ul>
+
+@code {
+    List<PersonModel> people;
+    List<TodoModel> todos;
+    protected override async Task OnInitializedAsync()
+    {
+        people = await _mediator.Send(new GetPersonListQuery());
+
+        todos = await _mediator.Send(new GetTodoListQuery());
+    }
+
+    public void CompleteTodo(TodoModel todo)
+    {
+        _mediator.Send(new DataStore.Todo.Commands.DeleteTodoCommand(todo.Id));
+    }
+}
